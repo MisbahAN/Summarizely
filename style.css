@@ -1,0 +1,638 @@
+/* Import futuristic fonts */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap");
+
+/* Root variables for consistent theming */
+:root {
+  --primary-neon: #00ffff;
+  --secondary-neon: #98ff98;  /* Pistachio neon */
+  --accent-pink: #ff69b4;    /* Softer pink */
+  --bg-dark: #0f1a1a;        /* Darker teal-tinted background */
+  --bg-card: #1a2a2a;        /* Slightly lighter card background */
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --border-glow: rgba(152, 255, 152, 0.3);  /* Pistachio glow */
+  --shadow-neon: 0 0 20px var(--primary-neon);
+  --shadow-green: 0 0 20px var(--secondary-neon);
+  --shadow-pink: 0 0 20px var(--accent-pink);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    45deg,
+    var(--primary-neon),
+    var(--secondary-neon)
+  );
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    45deg,
+    var(--secondary-neon),
+    var(--accent-pink)
+  );
+}
+
+/* Base styling */
+html,
+body,
+[class*="css"] {
+  background: linear-gradient(
+    135deg,
+    #0f1a1a 0%,
+    #1a2a2a 50%,
+    #1a1a2a 100%
+  ) !important;
+  color: var(--text-primary) !important;
+  font-family: "Rajdhani", sans-serif !important;
+  scroll-behavior: smooth !important;
+}
+
+.main .block-container {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  max-width: 1200px !important;
+}
+
+/* Animated background particles effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(
+      circle at 20% 80%,
+      rgba(0, 255, 255, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(152, 255, 152, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      rgba(255, 105, 180, 0.05) 0%,
+      transparent 50%
+    );
+  animation: float 30s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-15px) rotate(120deg);
+  }
+  66% {
+    transform: translateY(10px) rotate(240deg);
+  }
+}
+
+/* Typography with glitch effect */
+h1 {
+  font-family: "Orbitron", monospace !important;
+  font-weight: 900 !important;
+  font-size: 3.5rem !important;
+  background: linear-gradient(
+    45deg,
+    var(--primary-neon),
+    var(--secondary-neon),
+    var(--accent-pink)
+  ) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-align: center !important;
+  margin-bottom: 1rem !important;
+  position: relative !important;
+  animation: glow-pulse 4s ease-in-out infinite alternate !important;
+}
+
+h1::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    var(--primary-neon),
+    var(--secondary-neon)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glitch 5s infinite;
+  opacity: 0;
+}
+
+@keyframes glow-pulse {
+  0% {
+    filter: drop-shadow(0 0 5px var(--primary-neon))
+      drop-shadow(0 0 15px var(--primary-neon));
+  }
+  100% {
+    filter: drop-shadow(0 0 10px var(--secondary-neon))
+      drop-shadow(0 0 25px var(--secondary-neon));
+  }
+}
+
+@keyframes glitch {
+  0%,
+  90%,
+  100% {
+    opacity: 0;
+  }
+  95% {
+    opacity: 0.8;
+    transform: translateX(2px);
+  }
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Orbitron", monospace !important;
+  color: var(--secondary-neon) !important;
+  text-shadow: 0 0 10px var(--secondary-neon) !important;
+  font-weight: 700 !important;
+  margin: 1.5rem 0 1rem 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+h2:hover,
+h3:hover {
+  transform: translateX(5px) !important;
+  text-shadow: 0 0 15px var(--secondary-neon), 0 0 30px var(--secondary-neon) !important;
+}
+
+/* Glassmorphism cards */
+.glass-card {
+  background: rgba(26, 42, 42, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(152, 255, 152, 0.1) !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+  margin: 1rem 0 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.glass-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(152, 255, 152, 0.1),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.glass-card:hover::before {
+  left: 100%;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 20px 40px rgba(152, 255, 152, 0.1),
+    0 0 0 1px rgba(152, 255, 152, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Enhanced input fields */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stSelectbox > div > div > select {
+  background: rgba(26, 42, 42, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 2px solid transparent !important;
+  border-radius: 12px !important;
+  color: var(--text-primary) !important;
+  padding: 16px 20px !important;
+  font-size: 16px !important;
+  font-family: "Rajdhani", sans-serif !important;
+  font-weight: 500 !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+  position: relative !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+.stSelectbox > div > div > select:focus {
+  background: rgba(26, 42, 42, 0.8) !important;
+  border: 2px solid var(--secondary-neon) !important;
+  box-shadow: 0 0 0 4px rgba(152, 255, 152, 0.1),
+    0 8px 25px rgba(152, 255, 152, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  outline: none !important;
+  transform: translateY(-2px) !important;
+}
+
+.stTextArea > div > div > textarea {
+  min-height: 200px !important;
+  resize: vertical !important;
+}
+
+/* Futuristic buttons */
+.stButton > button {
+  background: linear-gradient(
+    135deg,
+    var(--primary-neon),
+    var(--secondary-neon)
+  ) !important;
+  color: var(--bg-dark) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 16px 32px !important;
+  font-family: "Orbitron", monospace !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  letter-spacing: 1px !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  box-shadow: 0 8px 25px rgba(152, 255, 152, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  text-transform: uppercase !important;
+  min-width: 200px !important;
+  margin: 1rem auto !important;
+  display: block !important;
+}
+
+.stButton > button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.stButton > button:hover::before {
+  left: 100%;
+}
+
+.stButton > button:hover {
+  background: linear-gradient(
+    135deg,
+    var(--secondary-neon),
+    var(--accent-pink)
+  ) !important;
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 0 15px 35px rgba(152, 255, 152, 0.4),
+    0 0 0 3px rgba(152, 255, 152, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.stButton > button:active {
+  transform: translateY(-1px) scale(0.98) !important;
+}
+
+/* Sidebar enhancements */
+.css-1d391kg,
+.css-1cypcdb {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 26, 26, 0.95),
+    rgba(26, 42, 42, 0.95)
+  ) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(152, 255, 152, 0.2) !important;
+  padding: 2rem 1.5rem !important;
+}
+
+.css-1d391kg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--primary-neon),
+    var(--secondary-neon),
+    var(--accent-pink)
+  );
+  opacity: 0.5;
+  animation: pulse-line 2s ease-in-out infinite;
+}
+
+@keyframes pulse-line {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* File uploader styling */
+.stFileUploader > div {
+  background: rgba(26, 42, 42, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 2px dashed rgba(152, 255, 152, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 2rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.stFileUploader > div:hover {
+  background: rgba(26, 42, 42, 0.8) !important;
+  border-color: var(--secondary-neon) !important;
+  box-shadow: 0 0 20px rgba(152, 255, 152, 0.1) !important;
+}
+
+/* Alert messages */
+.stAlert {
+  background: rgba(26, 42, 42, 0.8) !important;
+  backdrop-filter: blur(15px) !important;
+  border: none !important;
+  border-left: 4px solid var(--secondary-neon) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+  color: var(--text-primary) !important;
+  animation: slide-in 0.5s ease-out !important;
+}
+
+.stAlert[data-baseweb="notification"][kind="error"] {
+  border-left-color: #ff4757 !important;
+  box-shadow: 0 8px 25px rgba(255, 71, 87, 0.2) !important;
+}
+
+.stAlert[data-baseweb="notification"][kind="success"] {
+  border-left-color: var(--secondary-neon) !important;
+  box-shadow: 0 8px 25px rgba(152, 255, 152, 0.2) !important;
+}
+
+.stAlert[data-baseweb="notification"][kind="warning"] {
+  border-left-color: #feca57 !important;
+  box-shadow: 0 8px 25px rgba(254, 202, 87, 0.2) !important;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Spinner enhancement */
+.stSpinner > div {
+  border-color: var(--primary-neon) transparent var(--secondary-neon)
+    transparent !important;
+  animation: spin 1s linear infinite, glow-spin 2s ease-in-out infinite !important;
+}
+
+@keyframes glow-spin {
+  0%,
+  100% {
+    box-shadow: 0 0 10px var(--primary-neon);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--secondary-neon);
+  }
+}
+
+/* Expander styling */
+.streamlit-expanderHeader {
+  background: rgba(26, 42, 42, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(152, 255, 152, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.streamlit-expanderHeader:hover {
+  background: rgba(26, 42, 42, 0.8) !important;
+  border-color: var(--secondary-neon) !important;
+  box-shadow: 0 0 15px rgba(152, 255, 152, 0.1) !important;
+}
+
+/* Links */
+a {
+  color: var(--secondary-neon) !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+  position: relative !important;
+}
+
+a::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-neon),
+    var(--secondary-neon)
+  );
+  transition: width 0.3s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+a:hover {
+  color: var(--primary-neon) !important;
+  text-shadow: 0 0 8px var(--secondary-neon) !important;
+}
+
+/* Custom classes for enhanced styling */
+.hero-subtitle {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.feature-item {
+  background: rgba(26, 42, 42, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(152, 255, 152, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+  border-color: var(--secondary-neon);
+  box-shadow: 0 10px 30px rgba(152, 255, 152, 0.1);
+}
+
+.summary-display {
+  background: rgba(26, 42, 42, 0.6) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(152, 255, 152, 0.2) !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+  margin: 2rem 0 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-primary) !important;
+  font-size: 1.1rem !important;
+  line-height: 1.7 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.summary-display::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    var(--primary-neon),
+    var(--secondary-neon),
+    var(--accent-pink),
+    var(--primary-neon)
+  );
+  border-radius: 16px;
+  z-index: -1;
+  animation: border-rotate 4s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes border-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.5rem !important;
+  }
+  .main .block-container {
+    padding: 1rem !important;
+  }
+  .glass-card {
+    padding: 1.5rem !important;
+  }
+  .stButton > button {
+    min-width: 100% !important;
+    font-size: 16px !important;
+  }
+  .css-1d391kg {
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2rem !important;
+  }
+  .hero-subtitle {
+    font-size: 1rem !important;
+  }
+  .glass-card {
+    padding: 1rem !important;
+  }
+  .feature-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Loading animation for better UX */
+.loading-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Custom success message styling */
+.success-message {
+  background: linear-gradient(
+    135deg,
+    rgba(152, 255, 152, 0.1),
+    rgba(0, 255, 255, 0.1)
+  ) !important;
+  border: 1px solid rgba(152, 255, 152, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+  margin: 1rem 0 !important;
+  backdrop-filter: blur(10px) !important;
+  animation: success-glow 0.5s ease-out !important;
+}
+
+@keyframes success-glow {
+  0% {
+    box-shadow: 0 0 0 rgba(152, 255, 152, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(152, 255, 152, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(152, 255, 152, 0.1);
+  }
+}
