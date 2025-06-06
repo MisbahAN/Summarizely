@@ -231,11 +231,14 @@ Text:
         unsafe_allow_html=True,
     )
 
+    # Pre-compute the linebreak → <br> replacement outside of the f-string:
+    replaced_notes = notes.replace("\n", "<br>")
+
     st.markdown(
         f"""
         <div class="summary-display">
             <h3>📝 Gemini Study Notes</h3>
-            {notes.replace('\n', '<br>')}
+            {replaced_notes}
         </div>
         """,
         unsafe_allow_html=True,
