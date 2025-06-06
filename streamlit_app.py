@@ -7,7 +7,7 @@ from googleapiclient.errors import HttpError
 
 # ─── 1) Page Configuration (MUST be first) ─────────────────────────────────────
 st.set_page_config(
-    page_title="Summarizely - AI Document Creator",
+    page_title="Summarizely",
     layout="centered",
     initial_sidebar_state="expanded"
 )
