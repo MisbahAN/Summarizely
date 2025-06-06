@@ -1,44 +1,45 @@
 import os
-import tempfile
 import streamlit as st
 import google.generativeai as genai
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# ─── Page Configuration (MUST be first) ─────────────────────────────────────
+# ─── 1) Page Configuration (MUST be first) ─────────────────────────────────────
 st.set_page_config(
-    page_title="Summarizely - AI Document Creator", 
+    page_title="Summarizely",
     layout="centered",
     initial_sidebar_state="expanded"
 )
 
-# ─── Load CSS ─────────────────────────────────────────────────────────────
-with open('style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# ─── 2) Inject Custom CSS (style.css must live alongside this script) ─────────────
+if os.path.exists("style.css"):
+    with open("style.css") as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-# ─── Enhanced Hero Section ────────────────────────────────────────────────
+
+# ─── 3) Enhanced Hero Section ────────────────────────────────────────────────
 st.markdown(
     """
     <h1 data-text="SUMMARIZELY">SUMMARIZELY</h1>
     <div class="hero-subtitle">
-        Your Python-based AI sidekick: Gemini does the heavy lifting,<br>
+        Your Python‐based AI sidekick: Gemini does the heavy lifting,<br>
         then pushes polished summaries into Google Docs with futuristic style.
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-# ─── Feature Highlights ──────────────────────────────────────────────────
+# ─── 4) Feature Highlights ──────────────────────────────────────────────────
 st.markdown(
     """
     <div class="feature-grid">
         <div class="feature-item">
-            <h4>🤖 AI-Powered</h4>
+            <h4>🤖 AI‐Powered</h4>
             <p>Advanced Gemini AI for intelligent text summarization</p>
         </div>
         <div class="feature-item">
-            <h4>📄 Auto-Documentation</h4>
+            <h4>📄 Auto‐Documentation</h4>
             <p>Seamless Google Docs integration with sharing</p>
         </div>
         <div class="feature-item">
@@ -47,17 +48,17 @@ st.markdown(
         </div>
         <div class="feature-item">
             <h4>🔒 Secure</h4>
-            <p>Your data stays protected with enterprise-grade security</p>
+            <p>Your data stays protected with enterprise‐grade security</p>
         </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-# ─── Enhanced Sidebar Configuration ──────────────────────────────────────
+# ─── 5) Enhanced Sidebar Configuration ──────────────────────────────────────
 st.sidebar.markdown("### ⚙️ Configuration Panel")
 
-# Enhanced Gemini API key input
+# 5.1) Gemini API key input
 gemini_key = st.sidebar.text_input(
     "🔑 Gemini API Key",
     type="password",
@@ -65,68 +66,32 @@ gemini_key = st.sidebar.text_input(
     placeholder="Enter your Gemini API key..."
 )
 
-# Enhanced Service Account upload
-st.sidebar.markdown("### 📁 Service Account Authentication")
-sa_file = st.sidebar.file_uploader(
-    "Upload Service Account JSON",
-    type=["json"],
-    help="Upload your Google Cloud service account JSON file with Docs & Drive API access."
+# 5.2) Note: We use a *single* service account (summarizely_sa.json) for everyone.
+st.sidebar.markdown(
+    """
+    ### 📁 Service Account Authentication  
+    (Using the developer’s shared service account - no upload needed)
+    
+    This app uses a pre‐configured service account (`summarizely_sa.json`) stored on the server.  
+    All generated Docs will be created under that account.  
+    """
 )
 
-# Enhanced instructions with better styling
-with st.sidebar.expander("❓ How to create your service account JSON"):
-    st.markdown(
-        """
-        ### 🚀 Quick Setup Guide
-        
-        **1. Google Cloud Console**  
-        Visit: [console.cloud.google.com](https://console.cloud.google.com/)
-
-        **2. Create/Select Project**  
-        Click project dropdown → "New Project" → name it → Create
-
-        **3. Enable Required APIs**  
-        - APIs & Services → Library
-        - Search & enable "Google Docs API"
-        - Search & enable "Google Drive API"
-
-        **4. Create Service Account**  
-        - IAM & Admin → Service Accounts
-        - "Create Service Account"
-        - Name it (e.g., `summarizely-sa`)
-
-        **5. Grant Permissions**  
-        - Role: Project → Editor
-        - Continue → Done
-
-        **6. Generate JSON Key**  
-        - Click your service account
-        - Keys tab → Add Key → Create New Key
-        - Choose JSON → Create & download
-
-        **7. Upload Here**  
-        - Use the file uploader above ☝️
-        
-        🔐 **Security Note**: Keep your JSON file safe and never commit it to repositories.
-        """,
-        unsafe_allow_html=True,
-    )
-
-# Enhanced Gmail input
+# 5.3) User’s Gmail address for sharing (if not using a pre‐shared folder)
 user_gmail = st.sidebar.text_input(
     "✉️ Your Gmail Address",
     placeholder="your.email@gmail.com",
-    help="Gmail account that will receive edit access to the created document."
+    help="Enter your Gmail if you want this document shared directly to you."
 )
 
-# Enhanced folder ID input
+# 5.4) Optional: Shared Folder ID (folder-based auto‐share)
 shared_folder_id = st.sidebar.text_input(
     "📂 Shared Folder ID (Optional)",
-    placeholder="Google Drive folder ID",
-    help="If you have a pre-shared Google Drive folder, enter its ID here. Documents created inside will inherit sharing permissions."
+    placeholder="Enter a pre‐shared Google Drive folder ID",
+    help="If you already have a folder shared to your Gmail, enter its ID here. New Docs inside it inherit sharing."
 )
 
-# Enhanced document title input
+# 5.5) Custom document title
 doc_title = st.sidebar.text_input(
     "📋 Document Title",
     value="AI Summary",
@@ -136,22 +101,21 @@ doc_title = st.sidebar.text_input(
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     """
-    ### 📋 Checklist
-    - 🔑 Valid Gemini API Key
-    - 📄 Service Account JSON uploaded
-    - ✉️ Gmail address (if no shared folder)
-    - 📁 Optional: Shared folder ID
-    """,
-    unsafe_allow_html=True,
-)
+    ### 📋 Checklist  
+    - 🔑 Valid Gemini API Key  
+    - ✉️ Gmail address (if no shared folder)  
+    - 📁 Optional: Shared folder ID  
+    """
+, unsafe_allow_html=True)
 
-# ─── Enhanced Main Content Area ──────────────────────────────────────────
+# ─── 6) Enhanced Main Content Area ──────────────────────────────────────────
 st.markdown(
     """
     <div class="glass-card">
         <h2 style="margin-top: 0;">✍️ Input Your Content</h2>
         <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-            Paste or type any text you'd like to summarize. Our AI will process it and create a polished Google Doc.
+            Paste or type any text you'd like to summarize. Our AI will process it  
+            and create a polished Google Doc.
         </p>
     </div>
     """,
@@ -160,19 +124,17 @@ st.markdown(
 
 raw_text = st.text_area(
     label="",
-    placeholder="✨ Paste your content here... \n\nArticles, notes, research, meeting transcripts - anything you need summarized and documented!",
+    placeholder="✨ Paste your content here...  \n\nArticles, notes, research, meeting transcripts—anything you need summarized and documented!",
     height=250,
     key="raw_text_area",
 )
 
-# Enhanced processing button and logic
+# ─── 7) Processing Button & Logic ─────────────────────────────────────────
 if st.button("🚀 Generate & Create Google Doc"):
-    # Enhanced validation with better error styling
+    # 7.1) Validate inputs
     missing = []
     if not gemini_key:
         missing.append("🔑 Gemini API Key")
-    if sa_file is None:
-        missing.append("📄 Service Account JSON")
     if not shared_folder_id and not user_gmail:
         missing.append("✉️ Gmail Address or 📂 Shared Folder ID")
     if not raw_text.strip():
@@ -192,23 +154,33 @@ if st.button("🚀 Generate & Create Google Doc"):
             unsafe_allow_html=True,
         )
     else:
-        # Configure Gemini
+        # ─── 7.2) Configure Gemini ─────────────────────────────────────────
         genai.configure(api_key=gemini_key.strip())
 
-        # Save service account JSON to temp file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp:
-            tmp.write(sa_file.getbuffer())
-            tmp_path = tmp.name
+        # ─── 7.3) Load developer’s Service Account JSON ────────────────
+        SERVICE_ACCOUNT_FILE = "summarizely_sa.json"
+        if not os.path.exists(SERVICE_ACCOUNT_FILE):
+            st.markdown(
+                f"""
+                <div class="stAlert" style="border-left-color: #ff4757 !important;">
+                    <h4 style="color: #ff4757; margin-top: 0;">❌ Service Account Missing</h4>
+                    <p>The required service account JSON (`{SERVICE_ACCOUNT_FILE}`) was not found on the server.</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.stop()
 
-        # Build Google API clients
+        # ─── 7.4) Build Google Docs & Drive clients ────────────────────
         SCOPES = [
             "https://www.googleapis.com/auth/documents",
             "https://www.googleapis.com/auth/drive",
             "https://www.googleapis.com/auth/drive.file",
         ]
-
         try:
-            creds = service_account.Credentials.from_service_account_file(tmp_path, scopes=SCOPES)
+            creds = service_account.Credentials.from_service_account_file(
+                SERVICE_ACCOUNT_FILE, scopes=SCOPES
+            )
             docs_service = build("docs", "v1", credentials=creds)
             drive_service = build("drive", "v3", credentials=creds)
         except Exception as e:
@@ -216,18 +188,33 @@ if st.button("🚀 Generate & Create Google Doc"):
                 f"""
                 <div class="stAlert" style="border-left-color: #ff4757 !important;">
                     <h4 style="color: #ff4757; margin-top: 0;">❌ Authentication Failed</h4>
-                    <p>Failed to load Service Account credentials: {e}</p>
+                    <p>Failed to load service account credentials: {e}</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
             st.stop()
 
-        # AI Summarization with enhanced loading
+        # ─── 7.5) AI Summarization ────────────────────────────────────
         with st.spinner("🤖 AI is analyzing and summarizing your content..."):
             try:
                 model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
-                response = model.generate_content(f"Summarize this:\n{raw_text}")
+                
+                # Instead of a plain “Summarize this,” ask Gemini to create detailed, tutor-style notes:
+                prompt = f"""
+                    Please convert the following text into comprehensive, tutor‐style study notes. 
+                    - Organize the information under clear headings or sections.
+                    - Use bullet points for key concepts and definitions.
+                    - Include brief explanations or examples where helpful.
+                    - Highlight any important terms in bold or italics.
+
+                    Text to be transformed:
+                    \"\"\"
+                    {raw_text}
+                    \"\"\"
+                """
+
+                response = model.generate_content(prompt)
                 summary = response.text.strip()
             except Exception as e:
                 st.markdown(
@@ -260,17 +247,19 @@ if st.button("🚀 Generate & Create Google Doc"):
             unsafe_allow_html=True,
         )
 
-        # Create Google Doc & write summary
+        # ─── 7.6) Create Google Doc & write summary ────────────────────
         with st.spinner("📝 Creating Google Doc and writing summary..."):
             try:
                 if shared_folder_id.strip():
-                    # Create doc inside shared folder via Drive API
+                    # 7.6.1) Create doc inside shared folder (Drive API)
                     file_metadata = {
                         "name": doc_title or "AI Summary",
                         "mimeType": "application/vnd.google-apps.document",
                         "parents": [shared_folder_id.strip()],
                     }
-                    created = drive_service.files().create(body=file_metadata, fields="id").execute()
+                    created = drive_service.files().create(
+                        body=file_metadata, fields="id"
+                    ).execute()
                     doc_id = created["id"]
 
                     # Insert summary via Docs API
@@ -278,23 +267,32 @@ if st.button("🚀 Generate & Create Google Doc"):
                         documentId=doc_id,
                         body={
                             "requests": [
-                                {"insertText": {"location": {"index": 1}, "text": summary}}
+                                {
+                                    "insertText": {
+                                        "location": {"index": 1},
+                                        "text": summary
+                                    }
+                                }
                             ]
                         },
                     ).execute()
-
                 else:
-                    # Create a standalone doc via Docs API
+                    # 7.6.2) Create standalone doc (Docs API)
                     doc_body = {"title": doc_title or "AI Summary"}
                     doc = docs_service.documents().create(body=doc_body).execute()
                     doc_id = doc["documentId"]
 
-                    # Insert summary at the top
+                    # Insert summary at index=1
                     docs_service.documents().batchUpdate(
                         documentId=doc_id,
                         body={
                             "requests": [
-                                {"insertText": {"location": {"index": 1}, "text": summary}}
+                                {
+                                    "insertText": {
+                                        "location": {"index": 1},
+                                        "text": summary
+                                    }
+                                }
                             ]
                         },
                     ).execute()
@@ -316,7 +314,7 @@ if st.button("🚀 Generate & Create Google Doc"):
                                 f"""
                                 <div class="stAlert" style="border-left-color: #feca57 !important;">
                                     <h4 style="color: #feca57; margin-top: 0;">⚠️ Sharing Rate Limit Reached</h4>
-                                    <p>Doc was created, but auto-sharing failed. Please manually share it:</p>
+                                    <p>Document was created, but auto‐sharing failed. Please manually share it:</p>
                                     <p><a href="https://docs.google.com/document/d/{doc_id}" target="_blank">Open your new Doc →</a></p>
                                 </div>
                                 """,
@@ -324,7 +322,6 @@ if st.button("🚀 Generate & Create Google Doc"):
                             )
                         else:
                             raise
-
             except HttpError as err:
                 st.markdown(
                     f"""
@@ -359,8 +356,4 @@ if st.button("🚀 Generate & Create Google Doc"):
             unsafe_allow_html=True,
         )
 
-        # Cleanup temporary JSON file
-        try:
-            os.remove(tmp_path)
-        except OSError:
-            pass
+# ─── End of Script ───────────────────────────────────────────────────────────
