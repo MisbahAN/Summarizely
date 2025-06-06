@@ -59,83 +59,35 @@ Summarizely/
 
 ### Prerequisites
 
-- Python 3.8+ installed
-- Google Cloud Platform project with:
+- A Google Cloud Platform project with:
   - Google Docs API enabled
   - Google Drive API enabled
   - Service Account created (with Editor role)
   - Gemini API key
 
-### Local Setup
+### Using Summarizely
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/MisbahAN/Summarizely.git
-   cd Summarizely
-   ```
+1. Visit [Summarizely Web App](https://summarizely.streamlit.app/)
 
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: .\venv\Scripts\Activate.ps1
-   ```
-
-3. Install dependencies:
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-### Service Account Setup
-
-#### Local Testing
-- Copy your downloaded `summarizely_sa.json` into the project root
-- The app will read it directly from disk
-
-#### Production/Streamlit Cloud
-- Encode your service account JSON to Base64:
-  ```bash
-  python3 - << 'EOF'
-  import base64
-  print(base64.b64encode(open("summarizely_sa.json","rb").read()).decode())
-  EOF
-  ```
-- Store the resulting string in `summarizely_sa.json.b64`
-
-### Running Locally
-
-1. Ensure `summarizely_sa.json` is present in the root
-2. Set the environment variable (optional):
-   ```bash
-   export SERVICE_ACCOUNT_JSON_B64="$(cat summarizely_sa.json.b64)"
-   ```
-3. Run the Streamlit app:
-   ```bash
-   streamlit run streamlit_app.py
-   ```
-4. Open your browser at `http://localhost:8501`
-
-## 📝 Usage Instructions
-
-1. **Gemini API Key**
+2. **Gemini API Key**
    - Copy your key from Google Cloud Console
    - Paste into the "🔑 Gemini API Key" field in the sidebar
 
-2. **Service Account**
-   - Local: Ensure `summarizely_sa.json` exists in project root
-   - Deployed: App will decode `SERVICE_ACCOUNT_JSON_B64` automatically
+3. **Service Account**
+   - The app will automatically handle service account authentication
+   - No manual setup required
 
-3. **Gmail Address or Shared Folder ID**
+4. **Gmail Address or Shared Folder ID**
    - Enter Gmail for direct document sharing
    - Or paste a pre-shared Drive folder ID for inherited permissions
 
-4. **Document Title**
+5. **Document Title**
    - Enter custom title (defaults to "AI Summary")
 
-5. **Raw Text**
+6. **Raw Text**
    - Paste or type your content
 
-6. **Generate & Create**
+7. **Generate & Create**
    - Click "🚀 Generate & Create Google Doc"
    - Watch the progress with real-time feedback
    - Get a link to your new Doc when complete
