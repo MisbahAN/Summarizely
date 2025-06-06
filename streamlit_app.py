@@ -26,32 +26,32 @@ st.markdown(
         then pushes polished summaries into Google Docs with futuristic style.
     </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 # ─── 4) Feature Highlights ───────────────────────────────────────────────────
 st.markdown(
     """
     <div class="feature-grid">
-        <div class="feature-item">
-            <h4>🤖 AI-Powered</h4>
-            <p>Advanced Gemini AI for intelligent text summarization</p>
-        </div>
-        <div class="feature-item">
-            <h4>📄 Auto-Documentation</h4>
-            <p>Seamless Google Docs integration with sharing</p>
-        </div>
-        <div class="feature-item">
-            <h4>⚡ Lightning Fast</h4>
-            <p>Process and summarize content in seconds</p>
-        </div>
-        <div class="feature-item">
-            <h4>🔒 Secure</h4>
-            <p>Your data stays protected with enterprise-grade security</p>
-        </div>
+      <div class="feature-item">
+        <h4>🤖 AI-Powered</h4>
+        <p>Advanced Gemini AI for intelligent text summarization</p>
+      </div>
+      <div class="feature-item">
+        <h4>📄 Auto-Documentation</h4>
+        <p>Seamless Google Docs integration with sharing</p>
+      </div>
+      <div class="feature-item">
+        <h4>⚡ Lightning Fast</h4>
+        <p>Process and summarize content in seconds</p>
+      </div>
+      <div class="feature-item">
+        <h4>🔒 Secure</h4>
+        <p>Your data stays protected with enterprise-grade security</p>
+      </div>
     </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 # ─── 5) Sidebar Configuration ────────────────────────────────────────────────
@@ -65,21 +65,21 @@ gemini_key = st.sidebar.text_input(
     placeholder="Enter your Gemini API key..."
 )
 
-# 5.2) Authentication is handled behind the scenes, so no file upload is needed here.
+# 5.2) Behind-the-scenes authentication note
 st.sidebar.markdown(
     """
     **Authentication is managed by our service account—no upload required on your end.**
     """
 )
 
-# 5.3) User’s Gmail address for sharing (if not using a shared folder)
+# 5.3) User’s Gmail address (if no shared folder)
 user_gmail = st.sidebar.text_input(
     "✉️ Your Gmail Address",
     placeholder="your.email@gmail.com",
     help="Enter your Gmail if you want this document shared directly to you."
 )
 
-# 5.4) Optional: Shared Folder ID (folder-based auto-share)
+# 5.4) Optional: Shared Folder ID
 shared_folder_id = st.sidebar.text_input(
     "📂 Shared Folder ID (Optional)",
     placeholder="Enter a pre-shared Google Drive folder ID",
@@ -101,28 +101,28 @@ st.sidebar.markdown(
     - ✉️ Gmail address (if no shared folder)  
     - 📁 Optional: Shared folder ID  
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 # ─── 6) Main Content Area ────────────────────────────────────────────────────
 st.markdown(
     """
     <div class="glass-card">
-        <h2 style="margin-top: 0;">✍️ Input Your Content</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-            Paste or type any text you'd like to summarize. Our AI will process it  
-            and create a polished Google Doc.
-        </p>
+      <h2 style="margin-top: 0;">✍️ Input Your Content</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+        Paste or type any text you'd like to summarize. Our AI will process it
+        and create a polished Google Doc.
+      </p>
     </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 raw_text = st.text_area(
     label="",
     placeholder="✨ Paste your content here...\n\nArticles, notes, research, etc.",
     height=250,
-    key="raw_text_area",
+    key="raw_text_area"
 )
 
 # ─── 7) “Generate & Create” Logic ─────────────────────────────────────────────
@@ -138,16 +138,13 @@ if st.button("🚀 Generate & Create Google Doc"):
 
     if missing:
         st.markdown(
-            f"""
-            <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                <h4 style="color: #ff4757; margin-top: 0;">⚠️ Missing Required Information</h4>
-                <p>Please provide the following:</p>
-                <ul style="margin: 0.5rem 0;">
-                    {''.join(f'<li>{item}</li>' for item in missing)}
-                </ul>
-            </div>
-            """,
-            unsafe_allow_html=True,
+            "<div class='stAlert' style='border-left-color:#ff4757;'>"
+            "<h4 style='color:#ff4757; margin-top:0;'>⚠️ Missing Required Information</h4>"
+            "<p>Please provide the following:</p>"
+            "<ul style='margin:0.5rem 0;'>"
+            + "".join(f"<li>{item}</li>" for item in missing) +
+            "</ul></div>",
+            unsafe_allow_html=True
         )
         st.stop()
 
@@ -158,13 +155,11 @@ if st.button("🚀 Generate & Create Google Doc"):
     SERVICE_ACCOUNT_FILE = "summarizely_sa.json"
     if not os.path.exists(SERVICE_ACCOUNT_FILE):
         st.markdown(
-            f"""
-            <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                <h4 style="color: #ff4757; margin-top: 0;">❌ Service Account Missing</h4>
-                <p>The file <code>{SERVICE_ACCOUNT_FILE}</code> was not found on the server.</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
+            "<div class='stAlert' style='border-left-color:#ff4757;'>"
+            "<h4 style='color:#ff4757; margin-top:0;'>❌ Service Account Missing</h4>"
+            "<p>The file <code>summarizely_sa.json</code> was not found on the server.</p>"
+            "</div>",
+            unsafe_allow_html=True
         )
         st.stop()
 
@@ -172,7 +167,7 @@ if st.button("🚀 Generate & Create Google Doc"):
     SCOPES = [
         "https://www.googleapis.com/auth/documents",
         "https://www.googleapis.com/auth/drive",
-        "https://www.googleapis.com/auth/drive.file",
+        "https://www.googleapis.com/auth/drive.file"
     ]
     try:
         creds = service_account.Credentials.from_service_account_file(
@@ -182,66 +177,59 @@ if st.button("🚀 Generate & Create Google Doc"):
         drive_service = build("drive", "v3", credentials=creds)
     except Exception as e:
         st.markdown(
-            f"""
-            <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                <h4 style="color: #ff4757; margin-top: 0;">❌ Authentication Failed</h4>
-                <p>Could not load service account credentials: {e}</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
+            "<div class='stAlert' style='border-left-color:#ff4757;'>"
+            "<h4 style='color:#ff4757; margin-top:0;'>❌ Authentication Failed</h4>"
+            f"<p>Could not load service account credentials: {e}</p>"
+            "</div>",
+            unsafe_allow_html=True
         )
         st.stop()
 
     # ─── 7.5) Generate Tutor-Style Notes via Gemini ────────────
     with st.spinner("🤖 AI is analyzing and summarizing your content..."):
         try:
-            prompt = f"""
-Please convert the following text into comprehensive, tutor‐style study notes:
-- Organize under clear headings/sections.
-- Use bullet points for key concepts and definitions.
-- Include brief explanations or examples.
-- Highlight important terms in bold or italics.
-
-Text:
-\"\"\"
-{raw_text}
-\"\"\"
-"""
+            prompt = (
+                "Please convert the following text into comprehensive, tutor‐style study notes:\n"
+                "- Organize under clear headings/sections.\n"
+                "- Use bullet points for key concepts and definitions.\n"
+                "- Include brief explanations or examples.\n"
+                "- Highlight important terms in bold or italics.\n\n"
+                "Text:\n\"\"\"\n"
+                f"{raw_text}\n"
+                "\"\"\"\n"
+            )
             model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
             response = model.generate_content(prompt)
             notes = response.text.strip()
         except Exception as e:
             st.markdown(
-                f"""
-                <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                    <h4 style="color: #ff4757; margin-top: 0;">❌ Summarization Failed</h4>
-                    <p>Gemini AI encountered an error: {e}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
+                "<div class='stAlert' style='border-left-color:#ff4757;'>"
+                "<h4 style='color:#ff4757; margin-top:0;'>❌ Summarization Failed</h4>"
+                f"<p>Gemini AI encountered an error: {e}</p>"
+                "</div>",
+                unsafe_allow_html=True
             )
             st.stop()
 
     st.markdown(
-        """
-        <div class="success-message">
-            <h4 style="color: var(--secondary-neon); margin-top: 0;">✅ Tutor-Style Notes Ready!</h4>
-        </div>
-        """,
-        unsafe_allow_html=True,
+        "<div class='success-message'>"
+        "<h4 style='color:var(--secondary-neon); margin-top:0;'>✅ Tutor-Style Notes Ready!</h4>"
+        "</div>",
+        unsafe_allow_html=True
     )
 
+    # Strip out markdown bold markers (**) so they don't appear literally
+    clean_notes = notes.replace("**", "")
+
     # Pre-compute the linebreak → <br> replacement outside of the f-string:
-    replaced_notes = notes.replace("\n", "<br>")
+    replaced_notes = clean_notes.replace("\n", "<br>")
 
     st.markdown(
-        f"""
-        <div class="summary-display">
-            <h3>📝 Gemini Study Notes</h3>
-            {replaced_notes}
-        </div>
-        """,
-        unsafe_allow_html=True,
+        "<div class='summary-display'>"
+        "<h3>📝 Gemini Study Notes</h3>"
+        f"{replaced_notes}"
+        "</div>",
+        unsafe_allow_html=True
     )
 
     # ─── 7.6) Create Google Doc & insert notes ────────────────────
@@ -252,12 +240,14 @@ Text:
                 file_metadata = {
                     "name": doc_title or "AI Summary",
                     "mimeType": "application/vnd.google-apps.document",
-                    "parents": [shared_folder_id.strip()],
+                    "parents": [shared_folder_id.strip()]
                 }
-                created = drive_service.files().create(body=file_metadata, fields="id").execute()
+                created = drive_service.files().create(
+                    body=file_metadata, fields="id"
+                ).execute()
                 doc_id = created["id"]
 
-                # Insert notes
+                # Insert the clean text (without **)
                 docs_service.documents().batchUpdate(
                     documentId=doc_id,
                     body={
@@ -265,11 +255,11 @@ Text:
                             {
                                 "insertText": {
                                     "location": {"index": 1},
-                                    "text": notes
+                                    "text": clean_notes
                                 }
                             }
                         ]
-                    },
+                    }
                 ).execute()
             else:
                 # Create standalone doc
@@ -277,7 +267,7 @@ Text:
                 doc = docs_service.documents().create(body=doc_body).execute()
                 doc_id = doc["documentId"]
 
-                # Insert notes
+                # Insert the clean text (without **)
                 docs_service.documents().batchUpdate(
                     documentId=doc_id,
                     body={
@@ -285,11 +275,11 @@ Text:
                             {
                                 "insertText": {
                                     "location": {"index": 1},
-                                    "text": notes
+                                    "text": clean_notes
                                 }
                             }
                         ]
-                    },
+                    }
                 ).execute()
 
                 # Attempt to share with user’s Gmail
@@ -299,54 +289,47 @@ Text:
                         body={
                             "type": "user",
                             "role": "writer",
-                            "emailAddress": user_gmail.strip(),
+                            "emailAddress": user_gmail.strip()
                         },
-                        fields="id",
+                        fields="id"
                     ).execute()
                 except HttpError as share_err:
                     if share_err.status_code == 403 and "sharingRateLimitExceeded" in str(share_err):
                         st.markdown(
-                            f"""
-                            <div class="stAlert" style="border-left-color: #feca57 !important;">
-                                <h4 style="color: #feca57; margin-top: 0;">⚠️ Sharing Rate Limit Reached</h4>
-                                <p>Document was created, but auto‐sharing failed. Please manually share it:</p>
-                                <p><a href="https://docs.google.com/document/d/{doc_id}" target="_blank">Open your new Doc →</a></p>
-                            </div>
-                            """,
-                            unsafe_allow_html=True,
+                            "<div class='stAlert' style='border-left-color:#feca57;'>"
+                            "<h4 style='color:#feca57; margin-top:0;'>⚠️ Sharing Rate Limit Reached</h4>"
+                            "<p>Document was created, but auto‐sharing failed. Please manually share it:</p>"
+                            f"<p><a href='https://docs.google.com/document/d/{doc_id}' "
+                            "target='_blank'>Open your new Doc →</a></p>"
+                            "</div>",
+                            unsafe_allow_html=True
                         )
                     else:
                         raise
         except HttpError as err:
             st.markdown(
-                f"""
-                <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                    <h4 style="color: #ff4757; margin-top: 0;">❌ Google API Error</h4>
-                    <p>Failed to create/share Doc: {err}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
+                "<div class='stAlert' style='border-left-color:#ff4757;'>"
+                "<h4 style='color:#ff4757; margin-top:0;'>❌ Google API Error</h4>"
+                f"<p>Failed to create/share Doc: {err}</p>"
+                "</div>",
+                unsafe_allow_html=True
             )
             st.stop()
         except Exception as e:
             st.markdown(
-                f"""
-                <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                    <h4 style="color: #ff4757; margin-top: 0;">❌ Unexpected Error</h4>
-                    <p>Failed to create/share Doc: {e}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
+                "<div class='stAlert' style='border-left-color:#ff4757;'>"
+                "<h4 style='color:#ff4757; margin-top:0;'>❌ Unexpected Error</h4>"
+                f"<p>Failed to create/share Doc: {e}</p>"
+                "</div>",
+                unsafe_allow_html=True
             )
             st.stop()
 
     doc_url = f"https://docs.google.com/document/d/{doc_id}"
     st.markdown(
-        f"""
-        <div class="success-message">
-            <h4 style="color: var(--secondary-neon); margin-top: 0;">✅ Google Doc Created!</h4>
-            <p><a href="{doc_url}" target="_blank">🔗 Open your new Doc →</a></p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+        "<div class='success-message'>"
+        "<h4 style='color:var(--secondary-neon); margin-top:0;'>✅ Google Doc Created!</h4>"
+        f"<p><a href='{doc_url}' target='_blank'>🔗 Open your new Doc →</a></p>"
+        "</div>",
+        unsafe_allow_html=True
     )
