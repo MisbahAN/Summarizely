@@ -1,22 +1,24 @@
 import os
+import base64
 import streamlit as st
 import google.generativeai as genai
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# ─── 0) Ensure service account JSON is written from env var if missing ──────
+# ─── 0) Write service account JSON from Base64‐encoded env var ─────────────
 SERVICE_ACCOUNT_FILE = "summarizely_sa.json"
 if not os.path.exists(SERVICE_ACCOUNT_FILE):
-    # Attempt to read the JSON string from an environment variable
-    sa_json = os.getenv("SERVICE_ACCOUNT_JSON")
-    if sa_json:
+    # Try to read the base64‐encoded string from env
+    sa_b64 = os.getenv("SERVICE_ACCOUNT_JSON_B64")
+    if sa_b64:
         try:
-            with open(SERVICE_ACCOUNT_FILE, "w") as f:
-                f.write(sa_json)
+            decoded = base64.b64decode(sa_b64)
+            with open(SERVICE_ACCOUNT_FILE, "wb") as f:
+                f.write(decoded)
         except Exception as e:
-            st.error(f"❌ Failed to write service account JSON: {e}")
-    # If SERVICE_ACCOUNT_JSON is not set, we’ll catch this later when trying to load it.
+            st.error(f"❌ Failed to decode/write service account JSON: {e}")
+    # If SERVICE_ACCOUNT_JSON_B64 is not set, we’ll catch that below
 
 # ─── 1) Page Configuration (MUST be first) ─────────────────────────────────────
 st.set_page_config(
@@ -169,9 +171,9 @@ if st.button("🚀 Generate & Create Google Doc"):
         st.markdown(
             "<div class='stAlert' style='border-left-color:#ff4757;'>"
             "<h4 style='color:#ff4757; margin-top:0;'>❌ Service Account Missing</h4>"
-            "<p>The file <code>summarizely_sa.json</code> was not found on the server. "
-            "Make sure you set the <code>SERVICE_ACCOUNT_JSON</code> secret (containing the full JSON text) "
-            "in your Streamlit Cloud settings, so this file can be written automatically.</p>"
+            "<p>The file <code>summarizely_sa.json</code> was not found. "
+            "Ensure you added the Base64‐encoded secret <code>SERVICE_ACCOUNT_JSON_B64</code> "
+            "in Streamlit Cloud Settings → Secrets.</p>"
             "</div>",
             unsafe_allow_html=True
         )
@@ -234,8 +236,6 @@ if st.button("🚀 Generate & Create Google Doc"):
 
     # Strip out markdown bold markers (**) so they don't appear literally
     clean_notes = notes.replace("**", "")
-
-    # Pre-compute the linebreak → <br> replacement outside of the f-string:
     replaced_notes = clean_notes.replace("\n", "<br>")
 
     st.markdown(
@@ -250,7 +250,6 @@ if st.button("🚀 Generate & Create Google Doc"):
     with st.spinner("📝 Creating Google Doc and writing notes..."):
         try:
             if shared_folder_id.strip():
-                # Create doc inside shared folder
                 file_metadata = {
                     "name": doc_title or "AI Summary",
                     "mimeType": "application/vnd.google-apps.document",
@@ -261,7 +260,6 @@ if st.button("🚀 Generate & Create Google Doc"):
                 ).execute()
                 doc_id = created["id"]
 
-                # Insert the clean text (without **)
                 docs_service.documents().batchUpdate(
                     documentId=doc_id,
                     body={
@@ -276,12 +274,10 @@ if st.button("🚀 Generate & Create Google Doc"):
                     }
                 ).execute()
             else:
-                # Create standalone doc
                 doc_body = {"title": doc_title or "AI Summary"}
                 doc = docs_service.documents().create(body=doc_body).execute()
                 doc_id = doc["documentId"]
 
-                # Insert the clean text
                 docs_service.documents().batchUpdate(
                     documentId=doc_id,
                     body={
@@ -296,7 +292,6 @@ if st.button("🚀 Generate & Create Google Doc"):
                     }
                 ).execute()
 
-                # Attempt to share with user’s Gmail
                 try:
                     drive_service.permissions().create(
                         fileId=doc_id,

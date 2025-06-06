@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .env
 /venv
+summarizely_sa.json.b64
