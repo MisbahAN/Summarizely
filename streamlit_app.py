@@ -5,41 +5,40 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# ─── 1) Page Configuration (MUST be first) ─────────────────────────────────────
+# ─── 1) Page Configuration ─────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Summarizely",
+    page_title="Summarizely - AI Document Creator",
     layout="centered",
     initial_sidebar_state="expanded"
 )
 
-# ─── 2) Inject Custom CSS (style.css must live alongside this script) ─────────────
+# ─── 2) Inject Custom CSS ─────────────────────────────────────────────────────
 if os.path.exists("style.css"):
     with open("style.css") as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-
-# ─── 3) Enhanced Hero Section ────────────────────────────────────────────────
+# ─── 3) Enhanced Hero Section ───────────────────────────────────────────────
 st.markdown(
     """
     <h1 data-text="SUMMARIZELY">SUMMARIZELY</h1>
     <div class="hero-subtitle">
-        Your Python‐based AI sidekick: Gemini does the heavy lifting,<br>
+        Your Python-based AI sidekick: Gemini does the heavy lifting,<br>
         then pushes polished summaries into Google Docs with futuristic style.
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-# ─── 4) Feature Highlights ──────────────────────────────────────────────────
+# ─── 4) Feature Highlights ───────────────────────────────────────────────────
 st.markdown(
     """
     <div class="feature-grid">
         <div class="feature-item">
-            <h4>🤖 AI‐Powered</h4>
+            <h4>🤖 AI-Powered</h4>
             <p>Advanced Gemini AI for intelligent text summarization</p>
         </div>
         <div class="feature-item">
-            <h4>📄 Auto‐Documentation</h4>
+            <h4>📄 Auto-Documentation</h4>
             <p>Seamless Google Docs integration with sharing</p>
         </div>
         <div class="feature-item">
@@ -48,14 +47,14 @@ st.markdown(
         </div>
         <div class="feature-item">
             <h4>🔒 Secure</h4>
-            <p>Your data stays protected with enterprise‐grade security</p>
+            <p>Your data stays protected with enterprise-grade security</p>
         </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-# ─── 5) Enhanced Sidebar Configuration ──────────────────────────────────────
+# ─── 5) Sidebar Configuration ────────────────────────────────────────────────
 st.sidebar.markdown("### ⚙️ Configuration Panel")
 
 # 5.1) Gemini API key input
@@ -66,32 +65,30 @@ gemini_key = st.sidebar.text_input(
     placeholder="Enter your Gemini API key..."
 )
 
-# 5.2) Note: We use a *single* service account (summarizely_sa.json) for everyone.
+# 5.2) Since we’re using a shared service account, no file uploader is needed
 st.sidebar.markdown(
     """
     ### 📁 Service Account Authentication  
-    (Using the developer’s shared service account - no upload needed)
-    
-    This app uses a pre‐configured service account (`summarizely_sa.json`) stored on the server.  
-    All generated Docs will be created under that account.  
+    (Using developer’s service account: <code>summarizely_sa.json</code>)  
+    Ensure <code>summarizely_sa.json</code> is present in the repo or was written by CI.
     """
 )
 
-# 5.3) User’s Gmail address for sharing (if not using a pre‐shared folder)
+# 5.3) User’s Gmail address for sharing (if not using a shared folder)
 user_gmail = st.sidebar.text_input(
     "✉️ Your Gmail Address",
     placeholder="your.email@gmail.com",
     help="Enter your Gmail if you want this document shared directly to you."
 )
 
-# 5.4) Optional: Shared Folder ID (folder-based auto‐share)
+# 5.4) Optional: Shared Folder ID (folder-based auto-share)
 shared_folder_id = st.sidebar.text_input(
     "📂 Shared Folder ID (Optional)",
-    placeholder="Enter a pre‐shared Google Drive folder ID",
-    help="If you already have a folder shared to your Gmail, enter its ID here. New Docs inside it inherit sharing."
+    placeholder="Enter a pre-shared Google Drive folder ID",
+    help="If you already have a folder shared to your Gmail, enter its ID here. Docs inside inherit sharing."
 )
 
-# 5.5) Custom document title
+# 5.5) Document title
 doc_title = st.sidebar.text_input(
     "📋 Document Title",
     value="AI Summary",
@@ -105,10 +102,11 @@ st.sidebar.markdown(
     - 🔑 Valid Gemini API Key  
     - ✉️ Gmail address (if no shared folder)  
     - 📁 Optional: Shared folder ID  
-    """
-, unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
 
-# ─── 6) Enhanced Main Content Area ──────────────────────────────────────────
+# ─── 6) Main Content Area ────────────────────────────────────────────────────
 st.markdown(
     """
     <div class="glass-card">
@@ -124,14 +122,14 @@ st.markdown(
 
 raw_text = st.text_area(
     label="",
-    placeholder="✨ Paste your content here...  \n\nArticles, notes, research, meeting transcripts—anything you need summarized and documented!",
+    placeholder="✨ Paste your content here...\n\nArticles, notes, research, etc.",
     height=250,
     key="raw_text_area",
 )
 
-# ─── 7) Processing Button & Logic ─────────────────────────────────────────
+# ─── 7) “Generate & Create” Logic ─────────────────────────────────────────────
 if st.button("🚀 Generate & Create Google Doc"):
-    # 7.1) Validate inputs
+    # 7.1) Validate required fields
     missing = []
     if not gemini_key:
         missing.append("🔑 Gemini API Key")
@@ -147,213 +145,207 @@ if st.button("🚀 Generate & Create Google Doc"):
                 <h4 style="color: #ff4757; margin-top: 0;">⚠️ Missing Required Information</h4>
                 <p>Please provide the following:</p>
                 <ul style="margin: 0.5rem 0;">
-                    {''.join([f'<li>{item}</li>' for item in missing])}
+                    {''.join(f'<li>{item}</li>' for item in missing)}
                 </ul>
             </div>
             """,
             unsafe_allow_html=True,
         )
-    else:
-        # ─── 7.2) Configure Gemini ─────────────────────────────────────────
-        genai.configure(api_key=gemini_key.strip())
+        st.stop()
 
-        # ─── 7.3) Load developer’s Service Account JSON ────────────────
-        SERVICE_ACCOUNT_FILE = "summarizely_sa.json"
-        if not os.path.exists(SERVICE_ACCOUNT_FILE):
-            st.markdown(
-                f"""
-                <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                    <h4 style="color: #ff4757; margin-top: 0;">❌ Service Account Missing</h4>
-                    <p>The required service account JSON (`{SERVICE_ACCOUNT_FILE}`) was not found on the server.</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            st.stop()
+    # ─── 7.2) Configure Gemini ─────────────────────────────────────────
+    genai.configure(api_key=gemini_key.strip())
 
-        # ─── 7.4) Build Google Docs & Drive clients ────────────────────
-        SCOPES = [
-            "https://www.googleapis.com/auth/documents",
-            "https://www.googleapis.com/auth/drive",
-            "https://www.googleapis.com/auth/drive.file",
-        ]
+    # ─── 7.3) Ensure service account JSON is on disk ────────────────
+    SERVICE_ACCOUNT_FILE = "summarizely_sa.json"
+    if not os.path.exists(SERVICE_ACCOUNT_FILE):
+        st.markdown(
+            f"""
+            <div class="stAlert" style="border-left-color: #ff4757 !important;">
+                <h4 style="color: #ff4757; margin-top: 0;">❌ Service Account Missing</h4>
+                <p>The file <code>{SERVICE_ACCOUNT_FILE}</code> was not found on the server.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.stop()
+
+    # ─── 7.4) Build Google Docs & Drive clients ────────────────────
+    SCOPES = [
+        "https://www.googleapis.com/auth/documents",
+        "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/drive.file",
+    ]
+    try:
+        creds = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES
+        )
+        docs_service = build("docs", "v1", credentials=creds)
+        drive_service = build("drive", "v3", credentials=creds)
+    except Exception as e:
+        st.markdown(
+            f"""
+            <div class="stAlert" style="border-left-color: #ff4757 !important;">
+                <h4 style="color: #ff4757; margin-top: 0;">❌ Authentication Failed</h4>
+                <p>Could not load service account credentials: {e}</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.stop()
+
+    # ─── 7.5) Generate Tutor-Style Notes via Gemini ────────────
+    with st.spinner("🤖 AI is analyzing and summarizing your content..."):
         try:
-            creds = service_account.Credentials.from_service_account_file(
-                SERVICE_ACCOUNT_FILE, scopes=SCOPES
-            )
-            docs_service = build("docs", "v1", credentials=creds)
-            drive_service = build("drive", "v3", credentials=creds)
+            prompt = f"""
+Please convert the following text into comprehensive, tutor‐style study notes:
+- Organize under clear headings/sections.
+- Use bullet points for key concepts and definitions.
+- Include brief explanations or examples.
+- Highlight important terms in bold or italics.
+
+Text:
+\"\"\"
+{raw_text}
+\"\"\"
+"""
+            model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
+            response = model.generate_content(prompt)
+            notes = response.text.strip()
         except Exception as e:
             st.markdown(
                 f"""
                 <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                    <h4 style="color: #ff4757; margin-top: 0;">❌ Authentication Failed</h4>
-                    <p>Failed to load service account credentials: {e}</p>
+                    <h4 style="color: #ff4757; margin-top: 0;">❌ Summarization Failed</h4>
+                    <p>Gemini AI encountered an error: {e}</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
             st.stop()
 
-        # ─── 7.5) AI Summarization ────────────────────────────────────
-        with st.spinner("🤖 AI is analyzing and summarizing your content..."):
-            try:
-                model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
-                
-                # Instead of a plain “Summarize this,” ask Gemini to create detailed, tutor-style notes:
-                prompt = f"""
-                    Please convert the following text into comprehensive, tutor‐style study notes. 
-                    - Organize the information under clear headings or sections.
-                    - Use bullet points for key concepts and definitions.
-                    - Include brief explanations or examples where helpful.
-                    - Highlight any important terms in bold or italics.
+    st.markdown(
+        """
+        <div class="success-message">
+            <h4 style="color: var(--secondary-neon); margin-top: 0;">✅ Tutor-Style Notes Ready!</h4>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-                    Text to be transformed:
-                    \"\"\"
-                    {raw_text}
-                    \"\"\"
-                """
+    st.markdown(
+        f"""
+        <div class="summary-display">
+            <h3>📝 Gemini Study Notes</h3>
+            {notes.replace('\n', '<br>')}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-                response = model.generate_content(prompt)
-                summary = response.text.strip()
-            except Exception as e:
-                st.markdown(
-                    f"""
-                    <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                        <h4 style="color: #ff4757; margin-top: 0;">❌ Summarization Failed</h4>
-                        <p>Gemini AI encountered an error: {e}</p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                st.stop()
+    # ─── 7.6) Create Google Doc & insert notes ────────────────────
+    with st.spinner("📝 Creating Google Doc and writing notes..."):
+        try:
+            if shared_folder_id.strip():
+                # Create doc inside shared folder
+                file_metadata = {
+                    "name": doc_title or "AI Summary",
+                    "mimeType": "application/vnd.google-apps.document",
+                    "parents": [shared_folder_id.strip()],
+                }
+                created = drive_service.files().create(body=file_metadata, fields="id").execute()
+                doc_id = created["id"]
 
-        st.markdown(
-            """
-            <div class="success-message">
-                <h4 style="color: var(--secondary-neon); margin-top: 0;">✅ Summarization Complete!</h4>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            f"""
-            <div class="summary-display">
-                <h3>📝 Gemini Summary</h3>
-                {summary}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        # ─── 7.6) Create Google Doc & write summary ────────────────────
-        with st.spinner("📝 Creating Google Doc and writing summary..."):
-            try:
-                if shared_folder_id.strip():
-                    # 7.6.1) Create doc inside shared folder (Drive API)
-                    file_metadata = {
-                        "name": doc_title or "AI Summary",
-                        "mimeType": "application/vnd.google-apps.document",
-                        "parents": [shared_folder_id.strip()],
-                    }
-                    created = drive_service.files().create(
-                        body=file_metadata, fields="id"
-                    ).execute()
-                    doc_id = created["id"]
-
-                    # Insert summary via Docs API
-                    docs_service.documents().batchUpdate(
-                        documentId=doc_id,
-                        body={
-                            "requests": [
-                                {
-                                    "insertText": {
-                                        "location": {"index": 1},
-                                        "text": summary
-                                    }
+                # Insert notes
+                docs_service.documents().batchUpdate(
+                    documentId=doc_id,
+                    body={
+                        "requests": [
+                            {
+                                "insertText": {
+                                    "location": {"index": 1},
+                                    "text": notes
                                 }
-                            ]
-                        },
-                    ).execute()
-                else:
-                    # 7.6.2) Create standalone doc (Docs API)
-                    doc_body = {"title": doc_title or "AI Summary"}
-                    doc = docs_service.documents().create(body=doc_body).execute()
-                    doc_id = doc["documentId"]
+                            }
+                        ]
+                    },
+                ).execute()
+            else:
+                # Create standalone doc
+                doc_body = {"title": doc_title or "AI Summary"}
+                doc = docs_service.documents().create(body=doc_body).execute()
+                doc_id = doc["documentId"]
 
-                    # Insert summary at index=1
-                    docs_service.documents().batchUpdate(
-                        documentId=doc_id,
-                        body={
-                            "requests": [
-                                {
-                                    "insertText": {
-                                        "location": {"index": 1},
-                                        "text": summary
-                                    }
+                # Insert notes
+                docs_service.documents().batchUpdate(
+                    documentId=doc_id,
+                    body={
+                        "requests": [
+                            {
+                                "insertText": {
+                                    "location": {"index": 1},
+                                    "text": notes
                                 }
-                            ]
+                            }
+                        ]
+                    },
+                ).execute()
+
+                # Attempt to share with user’s Gmail
+                try:
+                    drive_service.permissions().create(
+                        fileId=doc_id,
+                        body={
+                            "type": "user",
+                            "role": "writer",
+                            "emailAddress": user_gmail.strip(),
                         },
+                        fields="id",
                     ).execute()
+                except HttpError as share_err:
+                    if share_err.status_code == 403 and "sharingRateLimitExceeded" in str(share_err):
+                        st.markdown(
+                            f"""
+                            <div class="stAlert" style="border-left-color: #feca57 !important;">
+                                <h4 style="color: #feca57; margin-top: 0;">⚠️ Sharing Rate Limit Reached</h4>
+                                <p>Document was created, but auto‐sharing failed. Please manually share it:</p>
+                                <p><a href="https://docs.google.com/document/d/{doc_id}" target="_blank">Open your new Doc →</a></p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        raise
+        except HttpError as err:
+            st.markdown(
+                f"""
+                <div class="stAlert" style="border-left-color: #ff4757 !important;">
+                    <h4 style="color: #ff4757; margin-top: 0;">❌ Google API Error</h4>
+                    <p>Failed to create/share Doc: {err}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.stop()
+        except Exception as e:
+            st.markdown(
+                f"""
+                <div class="stAlert" style="border-left-color: #ff4757 !important;">
+                    <h4 style="color: #ff4757; margin-top: 0;">❌ Unexpected Error</h4>
+                    <p>Failed to create/share Doc: {e}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.stop()
 
-                    # Attempt to share via Drive API
-                    try:
-                        drive_service.permissions().create(
-                            fileId=doc_id,
-                            body={
-                                "type": "user",
-                                "role": "writer",
-                                "emailAddress": user_gmail.strip(),
-                            },
-                            fields="id",
-                        ).execute()
-                    except HttpError as share_err:
-                        if share_err.status_code == 403 and "sharingRateLimitExceeded" in str(share_err):
-                            st.markdown(
-                                f"""
-                                <div class="stAlert" style="border-left-color: #feca57 !important;">
-                                    <h4 style="color: #feca57; margin-top: 0;">⚠️ Sharing Rate Limit Reached</h4>
-                                    <p>Document was created, but auto‐sharing failed. Please manually share it:</p>
-                                    <p><a href="https://docs.google.com/document/d/{doc_id}" target="_blank">Open your new Doc →</a></p>
-                                </div>
-                                """,
-                                unsafe_allow_html=True,
-                            )
-                        else:
-                            raise
-            except HttpError as err:
-                st.markdown(
-                    f"""
-                    <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                        <h4 style="color: #ff4757; margin-top: 0;">❌ Google API Error</h4>
-                        <p>Error while creating/sharing Doc: {err}</p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                st.stop()
-            except Exception as e:
-                st.markdown(
-                    f"""
-                    <div class="stAlert" style="border-left-color: #ff4757 !important;">
-                        <h4 style="color: #ff4757; margin-top: 0;">❌ Unexpected Error</h4>
-                        <p>Error while creating/sharing Doc: {e}</p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                st.stop()
-
-        doc_url = f"https://docs.google.com/document/d/{doc_id}"
-        st.markdown(
-            f"""
-            <div class="success-message">
-                <h4 style="color: var(--secondary-neon); margin-top: 0;">✅ Google Doc Created!</h4>
-                <p><a href="{doc_url}" target="_blank">🔗 Open your new Doc →</a></p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-# ─── End of Script ───────────────────────────────────────────────────────────
+    doc_url = f"https://docs.google.com/document/d/{doc_id}"
+    st.markdown(
+        f"""
+        <div class="success-message">
+            <h4 style="color: var(--secondary-neon); margin-top: 0;">✅ Google Doc Created!</h4>
+            <p><a href="{doc_url}" target="_blank">🔗 Open your new Doc →</a></p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
