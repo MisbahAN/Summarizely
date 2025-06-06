@@ -28,19 +28,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 4) Reconstruct service account JSON from the GitHub Secret
-      - name: Write service account JSON
-        run: |
-          echo "$SERVICE_ACCOUNT_JSON" > summarizely_sa.json
-        env:
-          SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-
-      # 5) (Removed lint step to avoid Flake8 failures)
-      # - name: Lint with flake8 (optional)
-      #   run: |
-      #     pip install flake8
-      #     flake8 --max-line-length=100 .
-
-      # 6) Verify that summarizely_sa.json exists
-      - name: Verify files
+      # 4) Verify files (environment vars handle service account at runtime)
+      - name: List repository contents
         run: ls -al .
+
+      # (No “write service account JSON” step needed—app writes from env at runtime)
