@@ -5,7 +5,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# ─── 1) Page Configuration ─────────────────────────────────────────────────────
+# ─── 1) Page Configuration (MUST be first) ─────────────────────────────────────
 st.set_page_config(
     page_title="Summarizely - AI Document Creator",
     layout="centered",
@@ -65,12 +65,10 @@ gemini_key = st.sidebar.text_input(
     placeholder="Enter your Gemini API key..."
 )
 
-# 5.2) Since we’re using a shared service account, no file uploader is needed
+# 5.2) Authentication is handled behind the scenes, so no file upload is needed here.
 st.sidebar.markdown(
     """
-    ### 📁 Service Account Authentication  
-    (Using developer’s service account: <code>summarizely_sa.json</code>)  
-    Ensure <code>summarizely_sa.json</code> is present in the repo or was written by CI.
+    **Authentication is managed by our service account—no upload required on your end.**
     """
 )
 
